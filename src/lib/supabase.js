@@ -11,7 +11,20 @@ if (!supabaseUrl || !supabaseAnonKey) {
   )
 }
 
+// Validate the URL format to prevent crashing if the user left the default placeholder in .env
+const isValidUrl = (url) => {
+  try {
+    return Boolean(new URL(url));
+  } catch (e) {
+    return false;
+  }
+};
+
+const finalUrl = supabaseUrl && isValidUrl(supabaseUrl) 
+  ? supabaseUrl 
+  : 'https://placeholder.supabase.co';
+
 export const supabase = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co',
+  finalUrl,
   supabaseAnonKey || 'placeholder-key'
 )
