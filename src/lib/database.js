@@ -47,8 +47,11 @@ export async function updateProfile(profileData) {
 
   const { data, error } = await supabase
     .from('profiles')
-    .update(profileData)
-    .eq('id', user.id)
+    .upsert({
+      id: user.id,
+      phone: user.phone, // Ensures the NOT NULL constraint is met if inserting
+      ...profileData
+    })
     .select()
     .single()
 
