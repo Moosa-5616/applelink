@@ -1,0 +1,233 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════
+   AppleLink Design System — CSS Custom Properties
+   Sahara Sand & Burnt Terracotta Premium Theme
+   ═══════════════════════════════════════════════════ */
+
+@theme {
+  /* ── Sahara Clay & Warm Sand Palettes ── */
+  --color-primary-50: #FAF5EF;       /* Desert Sand Tint */
+  --color-primary-100: #F4E7DA;      /* Light Clay Warmth */
+  --color-primary-200: #EAD0B8;      /* Sahara Dune Glow */
+  --color-primary-300: #DCB08E;      /* Oasis Amber */
+  --color-primary-400: #C2855F;      /* Soft Terracotta */
+  --color-primary-500: #B85C38;      /* Sahara Burnt Terracotta (Base Brand Accent) */
+  --color-primary-600: #9E4523;      /* Deep Terracotta Earth */
+  --color-primary-700: #813214;      /* Burnt Canyon sienna */
+  --color-primary-800: #5C1E07;      /* Rich Clay Carbon */
+  --color-primary-900: #3E1000;
+
+  --color-surface: #FFFFFF;
+  --color-background: #F7EFE5;       /* Premium Warm Sahara Dust sand background */
+  --color-background-alt: #EEDEC9;   /* Warm Oasis sand outline */
+
+  --color-text-primary: #211C18;     /* Charcoal Black (Warm Brown undertone) */
+  --color-text-secondary: #5E534A;   /* Sandy Clay Grey */
+  --color-text-muted: #A19182;       /* Sandy Muted Dust */
+
+  --color-border: #E3D7C5;           /* Sand outline borders */
+  --color-border-light: #F2EADA;
+
+  --color-warning: #D97706;
+  --color-warning-light: #FEF3C7;
+  --color-error: #DC2626;
+  --color-error-light: #FEE2E2;
+  --color-success: #15803D;
+  --color-success-light: #DCFCE7;
+  --color-info: #0284C7;
+  --color-info-light: #E0F2FE;
+
+  /* ── Typography ── */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* ── Shadows ── */
+  --shadow-xs: 0 1px 2px rgba(94, 83, 74, 0.04);
+  --shadow-card: 0 4px 20px -2px rgba(94, 83, 74, 0.08), 0 2px 8px -1px rgba(94, 83, 74, 0.04);
+  --shadow-elevated: 0 12px 24px -4px rgba(94, 83, 74, 0.12), 0 4px 12px -2px rgba(94, 83, 74, 0.08);
+  --shadow-modal: 0 24px 48px -12px rgba(94, 83, 74, 0.25);
+
+  /* ── Border Radius ── */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* ── Spacing Scale ── */
+  --space-nav-height: 4rem;
+  --space-header-height: 3.5rem;
+}
+
+/* ═══════════════════════════════════════════════════
+   Global Styles
+   ═══════════════════════════════════════════════════ */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease;
+}
+
+/* ═══════════════════════════════════════════════════
+   Scrollbar CSS
+   ═══════════════════════════════════════════════════ */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-text-muted);
+  border-radius: var(--radius-full);
+}
+
+/* ═══════════════════════════════════════════════════
+   Utility Classes & Custom Animations
+   ═══════════════════════════════════════════════════ */
+
+.page-container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  padding-top: calc(var(--space-header-height) + 0.75rem);
+  padding-bottom: calc(var(--space-nav-height) + 1.5rem);
+  min-height: 100dvh;
+}
+
+@media (min-width: 768px) {
+  .page-container {
+    max-width: 768px;
+    padding: 0 1.5rem;
+    padding-top: calc(var(--space-header-height) + 1rem);
+    padding-bottom: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page-container {
+    max-width: 1024px;
+    padding: 0 2rem;
+    padding-top: calc(var(--space-header-height) + 1.5rem);
+    padding-bottom: 2rem;
+  }
+}
+
+/* Premium Glass/Beige Effect */
+.glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Shimmer loading animation */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-border-light) 25%,
+    var(--color-border) 50%,
+    var(--color-border-light) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+/* ── Fun & Soft Custom Keyframes ── */
+
+/* 1. Springy lift-up on entrance */
+@keyframes springIn {
+  0% { opacity: 0; transform: translateY(12px) scale(0.98); }
+  60% { opacity: 0.8; transform: translateY(-2px) scale(1.005); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.animate-spring-in {
+  animation: springIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards;
+}
+
+.animate-fade-in {
+  animation: springIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 2. Slide Up responsive sheets */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(100%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 3. Circular gauge offset */
+@keyframes scoreRing {
+  from { stroke-dashoffset: 283; }
+}
+
+.animate-score-ring {
+  animation: scoreRing 1.2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+}
+
+/* 4. Active click compress */
+.action-spring:active {
+  transform: scale(0.96);
+  transition: transform 0.08s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* 5. Hover spring lift */
+.hover-spring {
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.hover-spring:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: var(--shadow-elevated);
+  border-color: var(--color-primary-300);
+}
+
+/* 6. Rating Wobble Animation */
+@keyframes starWobble {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2) rotate(8deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+.star-interactive:hover {
+  animation: starWobble 0.3s ease-in-out;
+  color: var(--color-warning);
+}
+
+/* 7. Subtle Pulsing notification indicator */
+@keyframes softPulse {
+  0% { box-shadow: 0 0 0 0 rgba(184, 92, 56, 0.2); }
+  75% { box-shadow: 0 0 0 8px rgba(184, 92, 56, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(184, 92, 56, 0); }
+}
+
+.indicator-pulse {
+  animation: softPulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}

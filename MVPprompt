@@ -1,0 +1,316 @@
+AppleLink – MVP Prompt for Anti-Gravity
+Project Overview
+
+Build a mobile-first web application called AppleLink.
+
+AppleLink is a B2B marketplace that helps apple farmers sell directly to verified buyers such as supermarkets, wholesalers, retailers, fruit distributors, and exporters.
+
+The goal is to reduce dependence on middlemen by giving farmers access to more buyers and giving buyers a trusted way to source apples directly from farms.
+
+This is an MVP, so focus only on solving the core problem with a polished, reliable user experience. Do not build unnecessary features.
+
+The Problem
+
+Apple farmers currently face several challenges:
+
+Middlemen take a significant share of the profits.
+Farmers often don't know the current market price.
+Finding reliable buyers is difficult.
+Buyers have difficulty trusting unknown sellers.
+Deals are managed through phone calls and WhatsApp with little transparency.
+Buyers worry about receiving poor-quality apples or inaccurate quantities.
+
+AppleLink should solve these problems by making buying and selling simple, transparent, and trustworthy.
+
+Primary Goal
+
+Allow farmers to:
+
+List apples for sale
+Receive offers from verified buyers
+Accept the best offer
+
+Allow buyers to:
+
+Find nearby apple suppliers
+Compare listings
+View seller reputation
+Contact farmers directly after accepting an offer
+User Roles
+Farmer
+
+Can:
+
+Register using phone number
+Complete profile
+Create listings
+Upload apple photos
+Receive offers
+Accept or reject offers
+View reviews
+Build a trusted reputation
+Buyer
+
+Examples:
+
+Supermarkets
+Fruit retailers
+Wholesalers
+Export companies
+
+Can:
+
+Register as a verified business
+Browse listings
+Search farmers
+Send purchase offers
+Review completed orders
+Save favorite farmers
+Authentication
+
+Simple OTP phone authentication.
+
+Users choose whether they are:
+
+Farmer
+Buyer
+Farmer Profile
+
+Each farmer profile should display:
+
+Name
+District
+Village
+Profile picture
+Years farming (optional)
+Verification badge
+Overall Trust Score
+Number of completed sales
+Average rating
+AI reputation summary
+Customer reviews
+Create Listing
+
+Farmers can create a listing with:
+
+Apple photos
+Apple variety
+Grade (A, B, C)
+Quantity
+Unit (Boxes / Kilograms)
+Expected price
+Harvest date
+Pickup location
+Short description
+
+Display listings as clean modern cards.
+
+Buyer Marketplace
+
+Buyers can browse listings using filters.
+
+Filters include:
+
+District
+Apple variety
+Grade
+Quantity
+Price range
+Verified sellers
+Highest rated sellers
+
+Each listing card displays:
+
+Apple photos
+Farmer name
+Trust Score
+Variety
+Grade
+Quantity
+Price
+Location
+Offer System
+
+Buyer selects a listing and submits:
+
+Offer price
+Pickup date
+Optional message
+
+Farmer can:
+
+Accept
+Reject
+
+Once accepted:
+
+Both users receive each other's contact details.
+Listing status changes to "Deal in Progress."
+
+No in-app payments are needed in the MVP.
+
+Review System
+
+Reviews are only allowed after a completed transaction.
+
+Buyers rate farmers on:
+
+Apple quality
+Freshness
+Packaging
+Quantity accuracy
+Communication
+Overall satisfaction
+
+Each category uses a 1–5 star rating.
+
+Buyers may also leave a written review.
+
+Only verified buyers who completed a deal can review a farmer.
+
+AI Reputation Summary
+
+The AI should not determine apple quality from images or invent ratings.
+
+Instead, it should summarize verified buyer feedback and transaction history.
+
+Example output:
+
+Trust Score: 93/100
+
+AI Summary
+
+This farmer has completed 54 verified sales. Buyers consistently praise the freshness of the apples, accurate grading, and reliable communication. Most deliveries match the listed quantity and quality.
+
+If reviews show recurring issues:
+
+Recent buyers reported inconsistent grading across several orders. Buyers should review the latest feedback before purchasing.
+
+The AI summary should always be based only on real reviews and completed transactions.
+
+Verification System
+
+Farmers:
+
+Phone verification
+Government ID upload (optional for MVP but supported in UI)
+Verification badge after admin approval
+
+Buyers:
+
+Business name
+Phone verification
+Business verification by admin
+
+Verified accounts appear higher in search.
+
+Dashboards
+Farmer Dashboard
+
+Display:
+
+Active listings
+Offers received
+Accepted deals
+Completed sales
+Average rating
+Trust Score
+Reviews
+Buyer Dashboard
+
+Display:
+
+Saved farmers
+Active offers
+Accepted purchases
+Purchase history
+Favorite sellers
+Admin Panel
+
+Admin can:
+
+Approve farmers
+Approve buyers
+Remove fake listings
+Suspend fraudulent accounts
+Remove fake reviews
+Resolve disputes
+Manage reported users
+Notifications
+
+Notify users when:
+
+Offer received
+Offer accepted
+Listing sold
+New review added
+Verification approved
+UI Design
+
+Use a premium, modern interface.
+
+Style:
+
+Clean
+Minimal
+Professional
+Mobile-first
+Responsive
+Fast loading
+
+Color palette:
+
+Green
+White
+Soft gray
+
+Use rounded cards, smooth animations, and simple navigation.
+
+Tech Suggestions
+
+Frontend:
+
+React
+Tailwind CSS
+
+Backend:
+
+Node.js
+Express
+
+Database:
+
+PostgreSQL or Supabase
+
+Authentication:
+
+Phone OTP
+
+Image Storage:
+
+Cloudinary
+Out of Scope (Do Not Build in MVP)
+
+Do not include:
+
+Online payments
+Live auctions
+AI image quality detection
+Transport booking
+Warehouse management
+Export documentation
+Crop insurance
+Loan marketplace
+Price prediction using AI
+Disease detection
+Inventory forecasting
+Multi-language support (can be added later)
+Success Criteria
+
+The MVP is successful if:
+
+A farmer can create an account and list apples in under 5 minutes.
+A verified buyer can discover listings, compare sellers, and submit an offer in under 3 minutes.
+Farmers receive multiple offers from different buyers.
+Buyers can confidently choose sellers based on verified reviews and AI-generated reputation summaries.
+The platform feels trustworthy, simple, and significantly reduces the need for middlemen in the initial buying process.

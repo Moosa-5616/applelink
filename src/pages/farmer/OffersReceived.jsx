@@ -1,0 +1,183 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Phone, Check, X } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { getOffersForFarmer, updateOfferStatus } from '../../lib/database';
+import Card from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
+import Badge from '../../components/ui/Badge';
+
+export default function OffersReceived() {
+  const navigate = useNavigate();
+  const { profile } = useAuth();
+  const [offers, setOffers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(null);
+
+  useEffect(() => {
+    const fetchOffers = async () => {
+      if (!profile?.id) return;
+      setLoading(true);
+      try {
+        const { data, error } = await getOffersForFarmer(profile.id);
+        if (error) {
+          console.error('Error fetching offers:', error);
+        } else {
+          setOffers(data || []);
+        }
+      } catch (err) {
+        console.error('Error fetching offers:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOffers();
+  }, [profile?.id]);
+
+  const handleAction = async (offerId, newStatus) => {
+    setActionLoading(offerId);
+    try {
+      const { error } = await updateOfferStatus(offerId, newStatus);
+      if (error) {
+        console.error('Error updating offer:', error);
+      } else {
+        // Update local state
+        setOffers(prev => prev.map(o => 
+          o.id === offerId ? { ...o, status: newStatus } : o
+        ));
+      }
+    } catch (err) {
+      console.error('Error updating offer:', err);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const getStatusBadge = (status) => {
+    const badges = {
+      pending: { variant: 'warning', text: 'Incoming Offer' },
+      accepted: { variant: 'success', text: 'Deal Accepted' },
+      rejected: { variant: 'error', text: 'Offer Declined' },
+      completed: { variant: 'info', text: 'Trade Completed' },
+    };
+    const current = badges[status] || { variant: 'gray', text: status };
+    return <Badge variant={current.variant}>{current.text}</Badge>;
+  };
+
+  return (
+    <div className="page-container flex flex-col gap-5">
+      {/* Back navbar */}
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => navigate(-1)}
+          className="p-2 rounded-xl bg-surface border border-border text-text-secondary hover:bg-background-alt cursor-pointer"
+        >
+          <ArrowLeft className="w-4 h-4" />
+        </button>
+        <span className="text-sm font-semibold text-text-secondary">Offers Received</span>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="w-10 h-10 border-4 border-primary-100 border-t-primary-600 rounded-full animate-spin mx-auto"></div>
+            <p className="mt-4 text-xs text-text-secondary">Loading offers...</p>
+          </div>
+        ) : offers.length > 0 ? (
+          offers.map((offer) => {
+            const isAccepted = offer.status === 'accepted';
+            const listing = offer.listing || {};
+            const buyer = offer.buyer || {};
+            return (
+              <Card key={offer.id} className="flex flex-col gap-3 relative overflow-hidden" padding="lg">
+                <div className="flex justify-between items-start border-b border-border-light pb-3">
+                  <div>
+                    <h3 className="font-extrabold text-sm text-text-primary">
+                      {listing.variety || 'Unknown'} (Grade {listing.grade || '?'})
+                    </h3>
+                    <p className="text-xs text-text-secondary mt-0.5">
+                      Requested price: <strong className="text-primary-700 font-bold">₹{offer.offer_price} / {listing.unit === 'boxes' ? 'box' : 'kg'}</strong>
+                    </p>
+                  </div>
+                  <div>{getStatusBadge(offer.status)}</div>
+                </div>
+
+                {/* Offer Details */}
+                <div className="flex flex-col gap-2 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Buyer Entity:</span>
+                    <span className="font-semibold text-text-primary">{buyer.business_name || buyer.full_name || 'Unknown'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Requested Pickup:</span>
+                    <span className="font-semibold text-text-primary">{new Date(offer.pickup_date).toLocaleDateString()}</span>
+                  </div>
+                  {offer.message && (
+                    <div className="bg-background-alt/50 border rounded-xl p-3 text-text-secondary leading-relaxed mt-1">
+                      "{offer.message}"
+                    </div>
+                  )}
+                </div>
+
+                {/* Swap contact details when deal accepted */}
+                {isAccepted ? (
+                  <div className="bg-primary-50 rounded-xl p-4 border border-primary-200 mt-2 flex flex-col gap-3 animate-fade-in">
+                    <div className="flex items-center gap-2 text-primary-900">
+                      <Phone className="w-4 h-4" />
+                      <h4 className="font-bold text-xs">Buyer Contact Details Exchanged</h4>
+                    </div>
+                    <div className="flex flex-col gap-1 text-[11px] text-primary-950 font-medium">
+                      <span>Representative: <strong className="text-text-primary">{buyer.full_name || 'N/A'}</strong></span>
+                      <span>Phone: <strong className="text-text-primary">{buyer.phone || 'N/A'}</strong></span>
+                      <span>Orchard Location: <strong className="text-text-primary">{listing.pickup_location || 'N/A'}</strong></span>
+                    </div>
+                    <p className="text-[10px] text-primary-800 leading-normal border-t border-primary-100 pt-2">
+                       Contact the buyer directly via phone or WhatsApp to coordinate transport and payment terms. No platform commission fees applied!
+                    </p>
+                  </div>
+                ) : null}
+
+                {/* Actions */}
+                {offer.status === 'pending' && (
+                  <div className="flex gap-2 mt-2 pt-2 border-t border-border-light">
+                    <Button
+                      variant="outline"
+                      fullWidth
+                      onClick={() => handleAction(offer.id, 'rejected')}
+                      size="sm"
+                      className="text-xs font-semibold text-error hover:bg-error-light"
+                      loading={actionLoading === offer.id}
+                      disabled={actionLoading !== null}
+                    >
+                      <X className="w-3.5 h-3.5 mr-1" />
+                      Decline Offer
+                    </Button>
+                    <Button
+                      variant="primary"
+                      fullWidth
+                      onClick={() => handleAction(offer.id, 'accepted')}
+                      size="sm"
+                      className="text-xs font-semibold"
+                      loading={actionLoading === offer.id}
+                      disabled={actionLoading !== null}
+                    >
+                      <Check className="w-3.5 h-3.5 mr-1" />
+                      Accept & Exchange Info
+                    </Button>
+                  </div>
+                )}
+              </Card>
+            );
+          })
+        ) : (
+          <div className="text-center py-12 bg-surface border border-dashed rounded-2xl">
+            <span className="text-4xl block mb-2 select-none">💬</span>
+            <h4 className="font-bold text-text-primary text-sm">No Offers Yet</h4>
+            <p className="text-xs text-text-secondary mt-1">Offers will appear here as soon as buyers check your listings.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
