@@ -77,8 +77,6 @@ export default function PendingReviews() {
       const { error: submitError } = await createReview(reviewData);
       if (submitError) throw submitError;
       
-      // Remove from list
-      setPendingOffers(prev => prev.filter(o => o.id !== selectedOffer.id));
       setSelectedOffer(null);
       
       // Reset form

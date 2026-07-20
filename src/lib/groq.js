@@ -62,14 +62,17 @@ export async function analyzeAuthenticity(profileId, role) {
       body: JSON.stringify({
         model: 'llama3-8b-8192',
         messages: [{ role: 'user', content: prompt }],
-        temperature: 0,
-        response_format: { type: 'json_object' }
+        temperature: 0
       })
     });
 
     const result = await response.json();
     if (result.choices && result.choices[0] && result.choices[0].message) {
-      const aiResponse = JSON.parse(result.choices[0].message.content);
+      // Strip markdown code blocks if present
+      let content = result.choices[0].message.content;
+      content = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      
+      const aiResponse = JSON.parse(content);
       
       if (aiResponse.status && aiResponse.reason) {
         // 3. Update the profile with the new AI status
