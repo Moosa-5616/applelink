@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Phone, Check, X, Lock, CreditCard } from 'lucide-react';
+import { ArrowLeft, Phone, Check, X, Lock, CreditCard, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getOffersForFarmer, updateOfferStatus } from '../../lib/database';
 import Card from '../../components/ui/Card';
@@ -87,7 +87,9 @@ export default function OffersReceived() {
         ) : offers.length > 0 ? (
           offers.map((offer) => {
             const isAccepted = offer.status === 'accepted';
-            const brokeragePaid = offer.brokerage_paid_farmer;
+            const farmerPaid = offer.brokerage_paid_farmer;
+            const buyerPaid = offer.brokerage_paid_buyer;
+            const bothPaid = farmerPaid && buyerPaid;
             const listing = offer.listing || {};
             const buyer = offer.buyer || {};
             const orderValue = (offer.offer_quantity || 0) * (offer.offer_price || 0);
@@ -136,8 +138,8 @@ export default function OffersReceived() {
 
                 {/* Contact details — gated behind brokerage payment */}
                 {isAccepted ? (
-                  brokeragePaid ? (
-                    // Brokerage paid — show buyer details normally
+                  bothPaid ? (
+                    // Both paid — show buyer details normally
                     <div className="bg-primary-50 rounded-xl p-4 border border-primary-200 mt-2 flex flex-col gap-3 animate-fade-in">
                       <div className="flex items-center gap-2 text-primary-900">
                         <Phone className="w-4 h-4" />
@@ -152,10 +154,9 @@ export default function OffersReceived() {
                          Contact the buyer directly via phone or WhatsApp to coordinate transport and payment terms.
                       </p>
                     </div>
-                  ) : (
-                    // Brokerage NOT paid — show blurred overlay with pay button
+                  ) : farmerPaid && !buyerPaid ? (
+                    // Farmer paid but buyer hasn't — show waiting state
                     <div className="relative mt-2 rounded-xl overflow-hidden">
-                      {/* Blurred content behind */}
                       <div className="bg-primary-50 rounded-xl p-4 border border-primary-200 flex flex-col gap-3" style={{ filter: 'blur(6px)', userSelect: 'none', pointerEvents: 'none' }}>
                         <div className="flex items-center gap-2 text-primary-900">
                           <Phone className="w-4 h-4" />
@@ -167,7 +168,36 @@ export default function OffersReceived() {
                           <span>Location: <strong>█████████████</strong></span>
                         </div>
                       </div>
-                      {/* Overlay CTA */}
+                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/60 backdrop-blur-sm rounded-xl">
+                        <div className="flex flex-col items-center gap-2 text-center px-4">
+                          <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
+                            <CheckCircle className="w-5 h-5 text-emerald-600" />
+                          </div>
+                          <h4 className="text-xs font-bold text-text-primary">Your Brokerage Fee is Paid ✓</h4>
+                          <p className="text-[10px] text-text-secondary leading-relaxed">
+                            Waiting for the buyer to pay their brokerage fee. Contact details will unlock once both parties have paid.
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <div className="w-4 h-4 border-2 border-primary-300 border-t-primary-600 rounded-full animate-spin"></div>
+                            <span className="text-[10px] text-primary-700 font-semibold">Waiting for buyer...</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    // Farmer hasn't paid — show blurred overlay with pay button
+                    <div className="relative mt-2 rounded-xl overflow-hidden">
+                      <div className="bg-primary-50 rounded-xl p-4 border border-primary-200 flex flex-col gap-3" style={{ filter: 'blur(6px)', userSelect: 'none', pointerEvents: 'none' }}>
+                        <div className="flex items-center gap-2 text-primary-900">
+                          <Phone className="w-4 h-4" />
+                          <h4 className="font-bold text-xs">Buyer Contact Details</h4>
+                        </div>
+                        <div className="flex flex-col gap-1 text-[11px] text-primary-950 font-medium">
+                          <span>Representative: <strong>████████████</strong></span>
+                          <span>Phone: <strong>██████████</strong></span>
+                          <span>Location: <strong>█████████████</strong></span>
+                        </div>
+                      </div>
                       <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/60 backdrop-blur-sm rounded-xl">
                         <div className="flex flex-col items-center gap-2 text-center px-4">
                           <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
