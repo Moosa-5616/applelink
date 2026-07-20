@@ -153,6 +153,17 @@ export default function OffersReceived() {
                       <p className="text-[10px] text-primary-800 leading-normal border-t border-primary-100 pt-2">
                          Contact the buyer directly via phone or WhatsApp to coordinate transport and payment terms.
                       </p>
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        className="mt-2 text-xs"
+                        onClick={() => handleAction(offer.id, 'completed')}
+                        loading={actionLoading === offer.id}
+                        disabled={actionLoading !== null}
+                      >
+                        <Check className="w-3.5 h-3.5 mr-1" />
+                        Mark Deal as Completed
+                      </Button>
                     </div>
                   ) : farmerPaid && !buyerPaid ? (
                     // Farmer paid but buyer hasn't — show waiting state

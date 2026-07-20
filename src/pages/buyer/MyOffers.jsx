@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Phone, Lock, CreditCard, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Phone, Lock, CreditCard, CheckCircle, Check } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getOffersForBuyer } from '../../lib/database';
+import { getOffersForBuyer, updateOfferStatus } from '../../lib/database';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
@@ -12,6 +12,7 @@ export default function MyOffers() {
   const { profile } = useAuth();
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(null);
 
   useEffect(() => {
     const fetchOffers = async () => {
@@ -33,6 +34,24 @@ export default function MyOffers() {
 
     fetchOffers();
   }, [profile?.id]);
+
+  const handleAction = async (offerId, newStatus) => {
+    setActionLoading(offerId);
+    try {
+      const { error } = await updateOfferStatus(offerId, newStatus);
+      if (error) {
+        console.error('Error updating offer:', error);
+      } else {
+        setOffers(prev => prev.map(o => 
+          o.id === offerId ? { ...o, status: newStatus } : o
+        ));
+      }
+    } catch (err) {
+      console.error('Error updating offer:', err);
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   const getStatusBadge = (status) => {
     const badges = {
@@ -131,6 +150,17 @@ export default function MyOffers() {
                       <p className="text-[10px] text-primary-800 leading-normal border-t border-primary-100 pt-2">
                         Please contact this farmer directly to finalize logistics, crate drop-offs, and secure bank / cash transfer accounts.
                       </p>
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        className="mt-2 text-xs"
+                        onClick={() => handleAction(offer.id, 'completed')}
+                        loading={actionLoading === offer.id}
+                        disabled={actionLoading !== null}
+                      >
+                        <Check className="w-3.5 h-3.5 mr-1" />
+                        Mark Deal as Completed
+                      </Button>
                     </div>
                   ) : buyerPaid && !farmerPaid ? (
                     // Buyer paid but farmer hasn't — show waiting state

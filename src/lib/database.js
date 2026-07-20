@@ -373,30 +373,68 @@ export async function getReviewsForFarmer(farmerId) {
 }
 
 /**
- * Create a review for a completed offer
+ * Get pending reviews for a user (completed offers they haven't reviewed)
+ */
+export async function getPendingReviews(userId) {
+  const { data, error } = await supabase
+    .from('offers')
+    .select(`
+      *,
+      listing:listings (
+        variety, grade,
+        farmer:profiles!farmer_id (id, full_name, business_name, role)
+      ),
+      buyer:profiles!buyer_id (id, full_name, business_name, role)
+    `)
+    .eq('status', 'completed')
+    .or(`and(farmer_id.eq.${userId},farmer_reviewed_buyer.eq.false),and(buyer_id.eq.${userId},buyer_reviewed_farmer.eq.false)`)
+    
+  return { data, error }
+}
+
+/**
+ * Create a review (can be from buyer to farmer, or farmer to buyer)
  */
 export async function createReview(reviewData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: new Error('Not authenticated') }
 
+  // Insert the review
   const { data, error } = await supabase
     .from('reviews')
     .insert({
       ...reviewData,
-      buyer_id: user.id,
+      reviewer_id: user.id
     })
     .select()
     .single()
 
-  // Create notification for the farmer
   if (data && !error) {
+    // Determine the role of the reviewer based on offer IDs
+    const isFarmerReviewing = user.id === reviewData.farmer_id;
+    
+    // Update the offer flag
+    const updatePayload = isFarmerReviewing 
+      ? { farmer_reviewed_buyer: true }
+      : { buyer_reviewed_farmer: true };
+
+    await supabase.from('offers').update(updatePayload).eq('id', reviewData.offer_id);
+
+    // Create notification for the reviewee
     await createNotification({
-      user_id: reviewData.farmer_id,
+      user_id: reviewData.reviewee_id,
       type: 'review_added',
       title: 'New Review',
-      message: `A buyer left a ${reviewData.overall_rating}-star review on your profile.`,
+      message: `You received a ${reviewData.overall_rating}-star review from your recent transaction.`,
       related_id: data.id,
     })
+
+    // Trigger AI Authenticity Analysis in background
+    import('./groq').then(module => {
+      // Analyze the user who just got reviewed
+      const revieweeRole = isFarmerReviewing ? 'buyer' : 'farmer';
+      module.analyzeAuthenticity(reviewData.reviewee_id, revieweeRole);
+    }).catch(err => console.error("Could not load Groq module:", err));
   }
 
   return { data, error }
