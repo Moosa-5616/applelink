@@ -38,8 +38,9 @@ ALTER TABLE profiles
   ADD COLUMN IF NOT EXISTS ai_authenticity_reason TEXT DEFAULT NULL;
 
 -- 4. Update Policies for Reviews
--- Drop existing insert policy to replace it with bidirectional logic
+-- Drop existing policies to replace them with bidirectional logic
 DROP POLICY IF EXISTS "Buyers can create reviews for their offers" ON reviews;
+DROP POLICY IF EXISTS "Participants can create reviews for their offers" ON reviews;
 
 CREATE POLICY "Participants can create reviews for their offers"
   ON reviews FOR INSERT
