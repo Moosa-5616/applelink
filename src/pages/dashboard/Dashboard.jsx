@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Heart, AlertCircle, ChevronRight } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useReviewCheck } from '../../contexts/ReviewContext';
-import { getDashboardStats, getReviewsForFarmer, getListings } from '../../lib/database';
+import { getDashboardStats, getReviewsForFarmer, getListings, getProfile } from '../../lib/database';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import TrustScore from '../../components/ui/TrustScore';
@@ -18,6 +18,7 @@ export default function Dashboard() {
   const [stats, setStats] = useState({ activeListingsCount: 0, incomingOffersCount: 0, userDealsCount: 0 });
   const [reviews, setReviews] = useState([]);
   const [favoriteFarmers, setFavoriteFarmers] = useState([]);
+  const [dashboardProfile, setDashboardProfile] = useState(profile);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,6 +26,12 @@ export default function Dashboard() {
       if (!profile?.id) return;
       setLoading(true);
       try {
+        // Fetch latest profile to ensure stats are up to date
+        const { data: freshProfile } = await getProfile();
+        if (freshProfile) {
+          setDashboardProfile(freshProfile);
+        }
+
         // Fetch stats
         const dashStats = await getDashboardStats(profile.id, role);
         setStats(dashStats);
@@ -71,8 +78,8 @@ export default function Dashboard() {
           <LayoutDashboard className="w-5 h-5 text-primary-600" />
           {role === 'farmer' ? 'Farmer Console' : 'Purchasing Dashboard'}
         </h2>
-        <Badge variant={profile?.is_verified ? 'verified' : 'gray'}>
-          {profile?.is_verified ? 'Verified Partner' : 'Standard Account'}
+        <Badge variant={dashboardProfile?.is_verified ? 'verified' : 'gray'}>
+          {dashboardProfile?.is_verified ? 'Verified Partner' : 'Standard Account'}
         </Badge>
       </div>
 
@@ -99,13 +106,13 @@ export default function Dashboard() {
           {/* Circular Trust Gauge & Level Indicators */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card className="flex items-center gap-4 justify-between" padding="lg">
-              <TrustScore score={profile?.trust_score || 75} size="lg" />
+              <TrustScore score={dashboardProfile?.trust_score || 0} size="lg" />
             </Card>
 
             <Card className="flex flex-col justify-between gap-1" padding="lg">
               <span className="text-[10px] text-text-secondary uppercase tracking-wider block font-bold">My Apple Yield Sales</span>
               <div className="flex items-baseline gap-1 mt-2">
-                <span className="text-3xl font-extrabold text-primary-600">{profile?.total_sales || 0}</span>
+                <span className="text-3xl font-extrabold text-primary-600">{dashboardProfile?.total_sales || 0}</span>
                 <span className="text-xs text-text-secondary font-medium">Completed Deals</span>
               </div>
               <span className="text-[10px] text-text-muted mt-2">Reputation score builds automatically on verified reviews.</span>
@@ -114,11 +121,11 @@ export default function Dashboard() {
             <Card className="flex flex-col justify-between gap-1" padding="lg">
               <span className="text-[10px] text-text-secondary uppercase tracking-wider block font-bold">Average Quality rating</span>
               <div className="flex items-baseline gap-1 mt-2">
-                <span className="text-3xl font-extrabold text-primary-600">{profile?.avg_rating || 0.0}</span>
+                <span className="text-3xl font-extrabold text-primary-600">{dashboardProfile?.avg_rating || 0.0}</span>
                 <span className="text-sm text-text-secondary">/ 5.0</span>
               </div>
               <div className="mt-2">
-                <StarRating rating={profile?.avg_rating || 0} showValue={false} size="sm" />
+                <StarRating rating={dashboardProfile?.avg_rating || 0} showValue={false} size="sm" />
               </div>
             </Card>
           </div>
@@ -173,6 +180,33 @@ export default function Dashboard() {
         </>
       ) : (
         <>
+          {/* Buyer Trust & Rating */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="flex items-center gap-4 justify-between" padding="lg">
+              <TrustScore score={dashboardProfile?.trust_score || 0} size="lg" />
+            </Card>
+
+            <Card className="flex flex-col justify-between gap-1" padding="lg">
+              <span className="text-[10px] text-text-secondary uppercase tracking-wider block font-bold">My Purchases</span>
+              <div className="flex items-baseline gap-1 mt-2">
+                <span className="text-3xl font-extrabold text-primary-600">{dashboardProfile?.total_sales || 0}</span>
+                <span className="text-xs text-text-secondary font-medium">Completed Deals</span>
+              </div>
+              <span className="text-[10px] text-text-muted mt-2">Farmers review your reliability and payments.</span>
+            </Card>
+
+            <Card className="flex flex-col justify-between gap-1" padding="lg">
+              <span className="text-[10px] text-text-secondary uppercase tracking-wider block font-bold">Average Reliability</span>
+              <div className="flex items-baseline gap-1 mt-2">
+                <span className="text-3xl font-extrabold text-primary-600">{dashboardProfile?.avg_rating || 0.0}</span>
+                <span className="text-sm text-text-secondary">/ 5.0</span>
+              </div>
+              <div className="mt-2">
+                <StarRating rating={dashboardProfile?.avg_rating || 0} showValue={false} size="sm" />
+              </div>
+            </Card>
+          </div>
+
           {/* Buyer view dashboard layout */}
           <div className="grid grid-cols-2 gap-4">
             <Card hoverable className="text-center py-6 flex flex-col items-center justify-center" onClick={() => navigate('/my-offers')}>
