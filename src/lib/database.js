@@ -300,6 +300,53 @@ export async function createOffer(offerData) {
 }
 
 /**
+ * Helper to recalculate and update a user's total_sales, avg_rating, and trust_score
+ */
+export async function recalculateProfileStats(profileId) {
+  try {
+    // Calculate total_sales (completed offers where the user is the farmer)
+    const { count: salesCount, error: salesError } = await supabase
+      .from('offers')
+      .select('id', { count: 'exact', head: true })
+      .eq('farmer_id', profileId)
+      .eq('status', 'completed');
+
+    // Calculate avg_rating from reviews where user is the reviewee
+    const { data: reviews, error: reviewsError } = await supabase
+      .from('reviews')
+      .select('overall_rating')
+      .eq('reviewee_id', profileId);
+
+    let avgRating = 0;
+    let trustScore = 50; // Default base trust score
+
+    if (reviews && reviews.length > 0) {
+      const sum = reviews.reduce((acc, curr) => acc + (curr.overall_rating || 0), 0);
+      avgRating = (sum / reviews.length).toFixed(1);
+      
+      // Calculate trust score based on avg rating and volume (max 100)
+      // Base score is rating * 15 (max 75). Add up to 25 points for volume (sales).
+      const ratingComponent = parseFloat(avgRating) * 15; // 5.0 -> 75
+      const volumeComponent = Math.min(25, (salesCount || reviews.length) * 2); 
+      trustScore = Math.round(ratingComponent + volumeComponent);
+    }
+
+    // Update profile
+    await supabase
+      .from('profiles')
+      .update({
+        total_sales: salesCount || 0,
+        avg_rating: parseFloat(avgRating),
+        trust_score: trustScore
+      })
+      .eq('id', profileId);
+
+  } catch (err) {
+    console.error('Error recalculating profile stats:', err);
+  }
+}
+
+/**
  * Update an offer's status (accept/reject)
  */
 export async function updateOfferStatus(offerId, status) {
@@ -328,6 +375,11 @@ export async function updateOfferStatus(offerId, status) {
       message: `Your offer on ${data.listing?.variety || 'a listing'} has been accepted. Contact details have been exchanged.`,
       related_id: data.id,
     })
+  }
+
+  // If status is completed, recalculate farmer's sales stats
+  if (data && !error && status === 'completed') {
+    await recalculateProfileStats(data.farmer_id);
   }
 
   return { data, error }
@@ -399,6 +451,18 @@ export async function createReview(reviewData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: new Error('Not authenticated') }
 
+  // Check if review already exists to prevent duplicates
+  const { data: existingReview } = await supabase
+    .from('reviews')
+    .select('id')
+    .eq('offer_id', reviewData.offer_id)
+    .eq('reviewer_id', user.id)
+    .maybeSingle()
+
+  if (existingReview) {
+    return { data: null, error: new Error('You have already submitted a review for this transaction.') }
+  }
+
   // Insert the review
   const { data, error } = await supabase
     .from('reviews')
@@ -435,6 +499,9 @@ export async function createReview(reviewData) {
       const revieweeRole = isFarmerReviewing ? 'buyer' : 'farmer';
       module.analyzeAuthenticity(reviewData.reviewee_id, revieweeRole);
     }).catch(err => console.error("Could not load Groq module:", err));
+    
+    // Recalculate stats for the user who was reviewed
+    await recalculateProfileStats(reviewData.reviewee_id);
   }
 
   return { data, error }
