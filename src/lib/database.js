@@ -304,45 +304,12 @@ export async function createOffer(offerData) {
  */
 export async function recalculateProfileStats(profileId) {
   try {
-    // Calculate total_sales (completed offers where the user is either farmer or buyer)
-    const { count: salesCount, error: salesError } = await supabase
-      .from('offers')
-      .select('id', { count: 'exact', head: true })
-      .eq('status', 'completed')
-      .or(`farmer_id.eq.${profileId},buyer_id.eq.${profileId}`);
-
-    // Calculate avg_rating from reviews where user is the reviewee
-    const { data: reviews, error: reviewsError } = await supabase
-      .from('reviews')
-      .select('overall_rating')
-      .eq('reviewee_id', profileId);
-
-    let avgRating = 0;
-    let trustScore = 50; // Default base trust score
-
-    if (reviews && reviews.length > 0) {
-      const sum = reviews.reduce((acc, curr) => acc + (curr.overall_rating || 0), 0);
-      avgRating = (sum / reviews.length).toFixed(1);
-      
-      // Calculate trust score based on avg rating and volume (max 100)
-      // Base score is rating * 15 (max 75). Add up to 25 points for volume (sales).
-      const ratingComponent = parseFloat(avgRating) * 15; // 5.0 -> 75
-      const volumeComponent = Math.min(25, (salesCount || reviews.length) * 2); 
-      trustScore = Math.round(ratingComponent + volumeComponent);
+    const { error } = await supabase.rpc('recalculate_user_stats', { user_id: profileId });
+    if (error) {
+      console.error('Error from RPC recalculating profile stats:', error);
     }
-
-    // Update profile
-    await supabase
-      .from('profiles')
-      .update({
-        total_sales: salesCount || 0,
-        avg_rating: parseFloat(avgRating),
-        trust_score: trustScore
-      })
-      .eq('id', profileId);
-
   } catch (err) {
-    console.error('Error recalculating profile stats:', err);
+    console.error('Exception recalculating profile stats:', err);
   }
 }
 
