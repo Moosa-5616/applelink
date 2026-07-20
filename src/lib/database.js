@@ -304,12 +304,12 @@ export async function createOffer(offerData) {
  */
 export async function recalculateProfileStats(profileId) {
   try {
-    // Calculate total_sales (completed offers where the user is the farmer)
+    // Calculate total_sales (completed offers where the user is either farmer or buyer)
     const { count: salesCount, error: salesError } = await supabase
       .from('offers')
       .select('id', { count: 'exact', head: true })
-      .eq('farmer_id', profileId)
-      .eq('status', 'completed');
+      .eq('status', 'completed')
+      .or(`farmer_id.eq.${profileId},buyer_id.eq.${profileId}`);
 
     // Calculate avg_rating from reviews where user is the reviewee
     const { data: reviews, error: reviewsError } = await supabase
