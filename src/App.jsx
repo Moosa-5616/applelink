@@ -22,8 +22,8 @@ import PendingReviews from './pages/PendingReviews';
 export default function App() {
   return (
     <AuthProvider>
-      <ReviewProvider>
-        <Router>
+      <Router>
+        <ReviewProvider>
           <Routes>
           {/* Public Auth Routes */}
           <Route path="/login" element={<LoginPage />} />
@@ -74,8 +74,8 @@ export default function App() {
           {/* Backup redirect */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </ReviewProvider>
       </Router>
-      </ReviewProvider>
     </AuthProvider>
   );
 }
