@@ -17,6 +17,7 @@ import Dashboard from './pages/dashboard/Dashboard';
 import NotificationsPage from './pages/NotificationsPage';
 import Profile from './pages/profile/Profile';
 import PayBrokerage from './pages/PayBrokerage';
+import PendingReviews from './pages/PendingReviews';
 
 export default function App() {
   return (
@@ -45,6 +46,7 @@ export default function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/pending-reviews" element={<PendingReviews />} />
 
             {/* Farmer Exclusive Routes */}
             <Route path="/create-listing" element={

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Heart } from 'lucide-react';
+import { LayoutDashboard, Heart, AlertCircle, ChevronRight } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useReviewCheck } from '../../contexts/ReviewContext';
 import { getDashboardStats, getReviewsForFarmer, getListings } from '../../lib/database';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
@@ -11,6 +12,7 @@ import Badge from '../../components/ui/Badge';
 
 export default function Dashboard() {
   const { profile, role } = useAuth();
+  const { pendingOffers } = useReviewCheck();
   const navigate = useNavigate();
 
   const [stats, setStats] = useState({ activeListingsCount: 0, incomingOffersCount: 0, userDealsCount: 0 });
@@ -73,6 +75,24 @@ export default function Dashboard() {
           {profile?.is_verified ? 'Verified Partner' : 'Standard Account'}
         </Badge>
       </div>
+
+      {pendingOffers?.length > 0 && (
+        <button 
+          onClick={() => navigate('/pending-reviews')}
+          className="w-full text-left bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-center justify-between hover:bg-amber-100 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <div className="bg-amber-100 p-2 rounded-lg">
+              <AlertCircle className="w-5 h-5 text-amber-700" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-amber-900">Action Required: Pending Reviews</h3>
+              <p className="text-xs text-amber-800 mt-0.5">You have {pendingOffers.length} review{pendingOffers.length > 1 ? 's' : ''} to complete before making new deals.</p>
+            </div>
+          </div>
+          <ChevronRight className="w-5 h-5 text-amber-700" />
+        </button>
+      )}
 
       {role === 'farmer' ? (
         <>

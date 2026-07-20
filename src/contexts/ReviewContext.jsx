@@ -1,16 +1,15 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { getPendingReviews } from '../lib/database';
-import MandatoryReviewModal from '../components/MandatoryReviewModal';
 
 const ReviewContext = createContext(null);
 
 export function ReviewProvider({ children }) {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [pendingOffers, setPendingOffers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [interceptCallback, setInterceptCallback] = useState(null);
 
   const fetchPending = async () => {
     if (!user?.id) {
@@ -37,7 +36,7 @@ export function ReviewProvider({ children }) {
 
   /**
    * Wrap any critical action with this function.
-   * If there are pending reviews, it intercepts the action and shows the review modal.
+   * If there are pending reviews, it intercepts the action and redirects to the pending reviews page.
    * Otherwise, it proceeds with the action.
    */
   const withReviewCheck = (actionCallback) => {
@@ -45,37 +44,16 @@ export function ReviewProvider({ children }) {
       if (e && e.preventDefault) e.preventDefault();
       
       if (pendingOffers.length > 0) {
-        setInterceptCallback(() => actionCallback);
-        setShowModal(true);
+        navigate('/pending-reviews');
       } else {
         actionCallback(e);
       }
     };
   };
 
-  const handleReviewSubmitted = (offerId) => {
-    const updated = pendingOffers.filter(o => o.id !== offerId);
-    setPendingOffers(updated);
-    
-    if (updated.length === 0) {
-      setShowModal(false);
-      if (interceptCallback) {
-        interceptCallback();
-        setInterceptCallback(null);
-      }
-    }
-  };
-
   return (
-    <ReviewContext.Provider value={{ withReviewCheck, pendingOffers }}>
+    <ReviewContext.Provider value={{ withReviewCheck, pendingOffers, refreshPendingReviews: fetchPending }}>
       {children}
-      {showModal && pendingOffers.length > 0 && (
-        <MandatoryReviewModal 
-          pendingOffer={pendingOffers[0]} 
-          onReviewSubmitted={handleReviewSubmitted} 
-          onCancel={() => setShowModal(false)}
-        />
-      )}
     </ReviewContext.Provider>
   );
 }
