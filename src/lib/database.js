@@ -4,6 +4,7 @@
 // ═══════════════════════════════════════════════════
 
 import { supabase } from './supabase'
+import { calculateBrokerageFee } from './constants'
 
 // ───────────────────────────────────────────────────
 // PROFILES
@@ -217,6 +218,29 @@ export async function getOffersForFarmer(farmerId) {
 }
 
 /**
+ * Get a single offer by ID with full details (for payment page)
+ */
+export async function getOfferById(offerId) {
+  const { data, error } = await supabase
+    .from('offers')
+    .select(`
+      *,
+      listing:listings (
+        id, variety, grade, quantity, unit, price_per_unit,
+        pickup_location, pickup_district, status,
+        farmer:profiles!farmer_id (id, full_name, phone, is_verified, trust_score, district, village)
+      ),
+      buyer:profiles!buyer_id (
+        id, full_name, phone, business_name, is_verified
+      )
+    `)
+    .eq('id', offerId)
+    .single()
+
+  return { data, error }
+}
+
+/**
  * Get offers sent by a buyer
  */
 export async function getOffersForBuyer(buyerId) {
@@ -246,11 +270,17 @@ export async function createOffer(offerData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { data: null, error: new Error('Not authenticated') }
 
+  // Calculate brokerage from order value
+  const orderValue = (offerData.offer_quantity || 0) * (offerData.offer_price || 0)
+  const { percentage, amount } = calculateBrokerageFee(orderValue)
+
   const { data, error } = await supabase
     .from('offers')
     .insert({
       ...offerData,
       buyer_id: user.id,
+      brokerage_amount: amount,
+      brokerage_percentage: percentage,
     })
     .select()
     .single()
@@ -299,6 +329,22 @@ export async function updateOfferStatus(offerId, status) {
       related_id: data.id,
     })
   }
+
+  return { data, error }
+}
+
+/**
+ * Mark brokerage as paid for a specific role (farmer or buyer)
+ */
+export async function updateBrokeragePaid(offerId, role) {
+  const field = role === 'farmer' ? 'brokerage_paid_farmer' : 'brokerage_paid_buyer'
+  
+  const { data, error } = await supabase
+    .from('offers')
+    .update({ [field]: true })
+    .eq('id', offerId)
+    .select()
+    .single()
 
   return { data, error }
 }

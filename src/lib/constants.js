@@ -37,3 +37,34 @@ export function generateAIReputationSummary(farmer, reviews) {
     return `Recent buyers reported inconsistent grading across several orders. Buyers should review the latest feedback before purchasing. The farmer has completed ${farmer.total_sales} sales total.`
   }
 }
+
+
+// ───────────────────────────────────────────────────
+// BROKERAGE FEE SYSTEM
+// Tiered brokerage based on order value (B2B wholesale rates)
+// ───────────────────────────────────────────────────
+
+export const BROKERAGE_TIERS = [
+  { maxValue: 50000,   percentage: 7 },   // ≤ ₹50K → 7%
+  { maxValue: 200000,  percentage: 6 },   // ₹50K–₹2L → 6%
+  { maxValue: 500000,  percentage: 4 },   // ₹2L–₹5L → 4%
+  { maxValue: Infinity, percentage: 3 },  // > ₹5L → 3%
+]
+
+/**
+ * Calculate brokerage fee based on total order value
+ * @param {number} orderValue - Total value (quantity × price per unit)
+ * @returns {{ percentage: number, amount: number }}
+ */
+export function calculateBrokerageFee(orderValue) {
+  if (!orderValue || orderValue <= 0) return { percentage: 0, amount: 0 }
+
+  const tier = BROKERAGE_TIERS.find(t => orderValue <= t.maxValue)
+  const percentage = tier ? tier.percentage : 3
+  const amount = Math.round((orderValue * percentage) / 100)
+
+  return { percentage, amount }
+}
+
+// Coupon code that bypasses the fake payment gateway
+export const BYPASS_COUPON_CODE = 'Moosa@123'

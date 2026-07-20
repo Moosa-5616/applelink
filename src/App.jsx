@@ -15,6 +15,7 @@ import MyOffers from './pages/buyer/MyOffers';
 import Dashboard from './pages/dashboard/Dashboard';
 import NotificationsPage from './pages/NotificationsPage';
 import Profile from './pages/profile/Profile';
+import PayBrokerage from './pages/PayBrokerage';
 
 export default function App() {
   return (
@@ -61,6 +62,9 @@ export default function App() {
                 <MyOffers />
               </ProtectedRoute>
             } />
+
+            {/* Brokerage Payment Route (both roles) */}
+            <Route path="/pay-brokerage/:offerId" element={<PayBrokerage />} />
           </Route>
 
           {/* Backup redirect */}

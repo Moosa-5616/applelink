@@ -22,6 +22,7 @@ export default function ListingDetail() {
   
   // Form submission for sending offers
   const [offerPrice, setOfferPrice] = useState('');
+  const [offerQuantity, setOfferQuantity] = useState('');
   const [pickupDate, setPickupDate] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -81,10 +82,21 @@ export default function ListingDetail() {
   const farmer = listing.farmer || {};
   const aiSummary = generateAIReputationSummary(farmer, reviews);
 
+  // Calculate live order value for display
+  const orderValue = (parseFloat(offerQuantity) || 0) * (parseFloat(offerPrice) || 0);
+
   const handleSendOffer = async (e) => {
     e.preventDefault();
     if (!offerPrice || parseFloat(offerPrice) <= 0) {
       setError('Please Enter a valid Offer Price');
+      return;
+    }
+    if (!offerQuantity || parseFloat(offerQuantity) <= 0) {
+      setError('Please enter how many ' + (listing.unit === 'boxes' ? 'boxes' : 'kgs') + ' you need');
+      return;
+    }
+    if (parseFloat(offerQuantity) > parseFloat(listing.quantity)) {
+      setError(`You can only request up to ${listing.quantity} ${listing.unit} (total available)`);
       return;
     }
     if (!pickupDate) {
@@ -100,6 +112,7 @@ export default function ListingDetail() {
         listing_id: listing.id,
         farmer_id: listing.farmer_id,
         offer_price: parseFloat(offerPrice),
+        offer_quantity: parseFloat(offerQuantity),
         pickup_date: pickupDate,
         message,
       });
@@ -268,6 +281,43 @@ export default function ListingDetail() {
                 required
                 disabled={loading}
               />
+
+              <div className="flex flex-col gap-1.5">
+                <Input
+                  label={`Quantity Needed (${listing.unit === 'boxes' ? 'boxes' : 'kgs'}) — Available: ${listing.quantity} ${listing.unit}`}
+                  type="number"
+                  value={offerQuantity}
+                  onChange={(e) => setOfferQuantity(e.target.value)}
+                  placeholder={`e.g. 50 out of ${listing.quantity}`}
+                  required
+                  disabled={loading}
+                  min="1"
+                  max={listing.quantity}
+                />
+                {offerQuantity && parseFloat(offerQuantity) > 0 && parseFloat(offerQuantity) <= parseFloat(listing.quantity) && (
+                  <p className="text-[10px] text-text-muted">
+                    Requesting {offerQuantity} of {listing.quantity} {listing.unit} ({((parseFloat(offerQuantity) / parseFloat(listing.quantity)) * 100).toFixed(1)}% of total stock)
+                  </p>
+                )}
+              </div>
+
+              {/* Live Order Value + Brokerage Preview */}
+              {orderValue > 0 && (
+                <div className="bg-primary-50 border border-primary-100 rounded-xl p-3 flex flex-col gap-1.5">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-text-secondary">Order Value:</span>
+                    <span className="font-bold text-text-primary">₹{orderValue.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-[11px]">
+                    <span className="text-text-muted">Est. Brokerage Fee:</span>
+                    <span className="font-semibold text-primary-700">
+                      ₹{Math.round((orderValue * (orderValue <= 50000 ? 7 : orderValue <= 200000 ? 6 : orderValue <= 500000 ? 4 : 3)) / 100).toLocaleString()}
+                      {' '}({orderValue <= 50000 ? '7' : orderValue <= 200000 ? '6' : orderValue <= 500000 ? '4' : '3'}%)
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-text-muted mt-0.5">Brokerage fee is payable after the farmer accepts your offer.</p>
+                </div>
+              )}
 
               <Input
                 label="Target Pickup Date"
