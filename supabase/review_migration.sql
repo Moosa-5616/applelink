@@ -29,7 +29,8 @@ ALTER TABLE reviews
 
 ALTER TABLE reviews
   ADD COLUMN IF NOT EXISTS payment_reliability_rating INTEGER CHECK (payment_reliability_rating IS NULL OR (payment_reliability_rating >= 1 AND payment_reliability_rating <= 5)),
-  ADD COLUMN IF NOT EXISTS reviewer_id UUID REFERENCES profiles(id) ON DELETE CASCADE;
+  ADD COLUMN IF NOT EXISTS reviewer_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  ADD COLUMN IF NOT EXISTS reviewee_id UUID REFERENCES profiles(id) ON DELETE CASCADE;
 
 -- 3. Modify PROFILES table for AI Authenticity
 ALTER TABLE profiles

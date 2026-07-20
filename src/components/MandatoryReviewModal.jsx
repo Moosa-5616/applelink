@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Star, ShieldAlert } from 'lucide-react';
+import { Star, ShieldAlert, X } from 'lucide-react';
 import { createReview } from '../lib/database';
 import { useAuth } from '../contexts/AuthContext';
 import Button from './ui/Button';
 
-export default function MandatoryReviewModal({ pendingOffer, onReviewSubmitted }) {
+export default function MandatoryReviewModal({ pendingOffer, onReviewSubmitted, onCancel }) {
   const { user, role } = useAuth();
   
   const [loading, setLoading] = useState(false);
@@ -104,17 +104,26 @@ export default function MandatoryReviewModal({ pendingOffer, onReviewSubmitted }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="bg-surface w-full max-w-lg rounded-2xl p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
+      <div className="bg-surface w-full max-w-lg rounded-2xl p-6 shadow-2xl overflow-y-auto max-h-[90vh] relative">
         
+        {onCancel && (
+          <button 
+            onClick={onCancel}
+            className="absolute top-4 right-4 p-2 bg-background-alt hover:bg-border rounded-full text-text-secondary"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
+
         <div className="flex items-center gap-3 text-error mb-4">
           <ShieldAlert className="w-8 h-8" />
-          <h2 className="text-xl font-bold">Mandatory Review Required</h2>
+          <h2 className="text-xl font-bold">Action Blocked</h2>
         </div>
         
         <p className="text-sm text-text-secondary mb-6">
-          To maintain a trusted marketplace and train our AI authenticity system, you must review 
+          To maintain a trusted marketplace, you must review 
           <strong> {otherPartyName} </strong> for your recently completed transaction of 
-          <strong> {pendingOffer.listing?.variety} Apples </strong> before continuing.
+          <strong> {pendingOffer.listing?.variety} Apples </strong> before you can make any new deals.
         </p>
 
         {error && (

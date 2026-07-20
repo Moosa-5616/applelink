@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { ReviewProvider } from './contexts/ReviewContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import AppLayout from './components/layout/AppLayout';
 
@@ -20,8 +21,9 @@ import PayBrokerage from './pages/PayBrokerage';
 export default function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
+      <ReviewProvider>
+        <Router>
+          <Routes>
           {/* Public Auth Routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/select-role" element={
@@ -71,6 +73,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
+      </ReviewProvider>
     </AuthProvider>
   );
 }

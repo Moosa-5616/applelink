@@ -4,6 +4,7 @@ import { ArrowLeft, MapPin, Calendar, Scale, ShieldCheck, CheckCircle, MessageSq
 import { getListingById, getReviewsForFarmer, createOffer } from '../../lib/database';
 import { generateAIReputationSummary } from '../../lib/constants';
 import { useAuth } from '../../contexts/AuthContext';
+import { useReviewCheck } from '../../contexts/ReviewContext';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import TrustScore from '../../components/ui/TrustScore';
@@ -15,6 +16,7 @@ export default function ListingDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { profile, role } = useAuth();
+  const { withReviewCheck } = useReviewCheck();
   
   const [listing, setListing] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -85,8 +87,8 @@ export default function ListingDetail() {
   // Calculate live order value for display
   const orderValue = (parseFloat(offerQuantity) || 0) * (parseFloat(offerPrice) || 0);
 
-  const handleSendOffer = async (e) => {
-    e.preventDefault();
+  const handleSendOffer = withReviewCheck(async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
     if (!offerPrice || parseFloat(offerPrice) <= 0) {
       setError('Please Enter a valid Offer Price');
       return;
@@ -125,7 +127,7 @@ export default function ListingDetail() {
     } finally {
       setLoading(false);
     }
-  };
+  });
 
   return (
     <div className="page-container flex flex-col gap-5">

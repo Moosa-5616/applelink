@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Phone, Check, X, Lock, CreditCard, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useReviewCheck } from '../../contexts/ReviewContext';
 import { getOffersForFarmer, updateOfferStatus } from '../../lib/database';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
@@ -10,6 +11,7 @@ import Badge from '../../components/ui/Badge';
 export default function OffersReceived() {
   const navigate = useNavigate();
   const { profile } = useAuth();
+  const { withReviewCheck } = useReviewCheck();
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
@@ -251,7 +253,7 @@ export default function OffersReceived() {
                     <Button
                       variant="primary"
                       fullWidth
-                      onClick={() => handleAction(offer.id, 'accepted')}
+                      onClick={withReviewCheck(() => handleAction(offer.id, 'accepted'))}
                       size="sm"
                       className="text-xs font-semibold"
                       loading={actionLoading === offer.id}

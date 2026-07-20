@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Sprout, Camera, ChevronRight, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useReviewCheck } from '../../contexts/ReviewContext';
 import { APPLE_VARIETIES, DISTRICTS, GRADES, UNITS } from '../../lib/constants';
 import { createListing, uploadListingPhoto } from '../../lib/database';
 import Card from '../../components/ui/Card';
@@ -13,6 +14,7 @@ import Badge from '../../components/ui/Badge';
 export default function CreateListing() {
   const navigate = useNavigate();
   const { profile } = useAuth();
+  const { withReviewCheck } = useReviewCheck();
 
   const [step, setStep] = useState(1); // 1 = Details, 2 = Confirmation, 3 = Success
   const [variety, setVariety] = useState('');
@@ -44,7 +46,7 @@ export default function CreateListing() {
     setStep(2);
   };
 
-  const handlePublish = async () => {
+  const handlePublish = withReviewCheck(async () => {
     setLoading(true);
     setError('');
 
@@ -82,7 +84,7 @@ export default function CreateListing() {
     } finally {
       setLoading(false);
     }
-  };
+  });
 
   return (
     <div className="page-container flex flex-col gap-5">
