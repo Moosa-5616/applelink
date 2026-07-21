@@ -109,7 +109,7 @@ export default function Profile() {
         </div>
         
         {role === 'farmer' && (
-          <TrustScore score={profile?.trust_score || 80} size="sm" showLabel={false} />
+          <TrustScore score={profile?.trust_score || 0} size="sm" showLabel={false} />
         )}
       </Card>
 

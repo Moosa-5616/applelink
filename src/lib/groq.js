@@ -47,7 +47,7 @@ export async function analyzeAuthenticity(profileId, role) {
       }
     `;
 
-    const apiKey = import.meta.env.GROQ_API_KEY;
+    const apiKey = import.meta.env.VITE_GROQ_API_KEY;
     if (!apiKey) {
       console.warn('Groq API Key not found. Skipping AI analysis.');
       return;

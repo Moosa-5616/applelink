@@ -9,6 +9,7 @@ import Button from '../../components/ui/Button';
 import TrustScore from '../../components/ui/TrustScore';
 import Input from '../../components/ui/Input';
 import Select from '../../components/ui/Select';
+import SearchableSelect from '../../components/ui/SearchableSelect';
 
 export default function Marketplace() {
   const navigate = useNavigate();
@@ -107,11 +108,11 @@ export default function Marketplace() {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              <Select
+              <SearchableSelect
                 label="Variety"
                 value={selectedVariety}
                 onChange={(e) => setSelectedVariety(e.target.value)}
-                options={APPLE_VARIETIES}
+                options={APPLE_VARIETIES.filter(v => v !== 'Other')}
                 placeholder="All varieties"
               />
 
@@ -189,7 +190,7 @@ export default function Marketplace() {
             >
               <div className="flex">
                 {/* Visual placeholder box for Apple photo */}
-                <div className="w-24 h-24 sm:w-28 sm:h-28 bg-gradient-to-br from-primary-50 to-primary-100/50 flex/col items-center justify-center shrink-0 border-r border-border flex flex-col justify-center">
+                <div className="w-24 h-24 sm:w-28 sm:h-28 bg-gradient-to-br from-primary-50 to-primary-100/50 flex-col items-center justify-center shrink-0 border-r border-border flex flex-col justify-center">
                   {listing.photos && listing.photos.length > 0 ? (
                     <img src={listing.photos[0]} alt={listing.variety} className="w-full h-full object-cover" />
                   ) : (

@@ -1,8 +1,32 @@
+import { useState, useEffect } from 'react'
 import { Bell, User } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../contexts/AuthContext'
+import { getNotifications } from '../../lib/database'
 
 export default function Header({ user }) {
   const navigate = useNavigate()
+  const { profile } = useAuth()
+  const [hasUnread, setHasUnread] = useState(false)
+
+  useEffect(() => {
+    const checkUnread = async () => {
+      if (!profile?.id) return
+      try {
+        const { data } = await getNotifications(profile.id)
+        if (data) {
+          setHasUnread(data.some(n => !n.is_read))
+        }
+      } catch (err) {
+        // Silently fail — notification dot is non-critical
+      }
+    }
+
+    checkUnread()
+    // Re-check every 30 seconds
+    const interval = setInterval(checkUnread, 30000)
+    return () => clearInterval(interval)
+  }, [profile?.id])
 
   return (
     <header className="fixed top-0 left-0 right-0 z-40 glass border-b border-border-light">
@@ -26,12 +50,17 @@ export default function Header({ user }) {
         <div className="flex items-center gap-1">
           {/* Notification bell */}
           <button
-            onClick={() => navigate('/notifications')}
+            onClick={() => {
+              setHasUnread(false)
+              navigate('/notifications')
+            }}
             className="relative p-2 rounded-xl hover:bg-background-alt transition-colors cursor-pointer"
           >
             <Bell className="w-5 h-5 text-text-secondary" />
-            {/* Notification dot */}
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full ring-2 ring-surface" />
+            {/* Notification dot — only shown when there are unread notifications */}
+            {hasUnread && (
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full ring-2 ring-surface" />
+            )}
           </button>
 
           {/* Profile */}
