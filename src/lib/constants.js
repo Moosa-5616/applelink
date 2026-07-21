@@ -4,18 +4,21 @@
 // ═══════════════════════════════════════════════════
 
 export const APPLE_VARIETIES = [
-  'Akane', 'Alice', 'Alkmene', 'Ambri', 'Ambrosia', 'Anna', 'Arkansas Black', 
-  'Ashmead\'s Kernel', 'Aurora Golden Gala', 'Baldwin', 'Banana', 'Braeburn', 
-  'Bramley', 'Cameo', 'Campanino', 'Cortland', 'Cosmic Crisp', 'Court Pendu Plat', 
-  'Cox\'s Orange Pippin', 'Cripps Pink (Pink Lady)', 'Crispin (Mutsu)', 'D\'Arcy Spice', 
-  'Discovery', 'Egremont Russet', 'Empire', 'Enterprise', 'Envy', 'Fuji', 'Gala', 
-  'Ginger Gold', 'Golden Delicious', 'Granny Smith', 'Gravenstein', 'Haralson', 
-  'Honeycrisp', 'Idared', 'Jazz', 'Jersey Mac', 'Jonagold', 'Jonathan', 'Kashmiri', 
-  'Liberty', 'Lodi', 'Macoun', 'Maharaji', 'McIntosh', 'Melrose', 'Mutsu', 
+  'Adams Pearmain', 'Airlie Red Flesh', 'Akane', 'Alice', 'Alkmene', 'Ambri', 
+  'Ambrosia', 'Anna', 'Arkansas Black', 'Ashmead\'s Kernel', 'Aurora Golden Gala', 
+  'Baldwin', 'Banana', 'Belle de Boskoop', 'Braeburn', 'Bramley', 
+  'Calville Blanc d\'Hiver', 'Cameo', 'Campanino', 'Cortland', 'Cosmic Crisp', 
+  'Court Pendu Plat', 'Cox\'s Orange Pippin', 'Cripps Pink (Pink Lady)', 'Crispin', 
+  'D\'Arcy Spice', 'Dabinett', 'Discovery', 'Egremont Russet', 'Elstar', 'Empire', 
+  'Enterprise', 'Envy', 'Fuji', 'Gala', 'Ginger Gold', 'Golden Delicious', 
+  'Granny Smith', 'Gravenstein', 'Haralson', 'Honeycrisp', 'Idared', 'Jazz', 
+  'Jersey Mac', 'Jonagold', 'Jonathan', 'Kashmiri', 'Lady Alice', 'Liberty', 
+  'Lodi', 'Macoun', 'Maharaji', 'McIntosh', 'Melrose', 'Mutsu (Crispin)', 
   'Newtown Pippin', 'Northern Spy', 'Opal', 'Orin', 'Pacific Rose', 'Paula Red', 
-  'Pinova', 'Red Delicious', 'Rome Beauty', 'Royal Delicious', 'Rubens', 'Salome', 
-  'Shimla', 'Spartan', 'Stayman', 'Suncrisp', 'SweeTango', 'Topaz', 'Wealthy', 
-  'Winesap', 'Winter Banana', 'Wolf River', 'York', 'Zestar', 'Other'
+  'Pinova', 'Red Delicious', 'Rhode Island Greening', 'Rome Beauty', 
+  'Royal Delicious', 'Rubens', 'Salome', 'Shimla', 'Spartan', 'Stayman', 
+  'Suncrisp', 'SweeTango', 'Topaz', 'Wealthy', 'Winesap', 'Winter Banana', 
+  'Wolf River', 'York', 'Zestar!', 'Other'
 ]
 
 export const DISTRICTS = [
