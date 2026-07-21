@@ -70,8 +70,8 @@ export default function LoginPage() {
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       {/* Brand Header */}
       <div className="flex flex-col items-center gap-2 mb-8 select-none">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-elevated">
-          <span className="text-white text-3xl">🍎</span>
+        <div className="w-16 h-16 rounded-2xl shadow-elevated overflow-hidden flex items-center justify-center bg-surface border border-border">
+          <img src="/logo.png" alt="AppleLink" className="w-full h-full object-cover" />
         </div>
         <div className="text-center">
           <h1 className="text-2xl font-black text-text-primary tracking-tight">

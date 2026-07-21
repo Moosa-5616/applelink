@@ -33,8 +33,8 @@ export default function Header({ user }) {
       <div className="max-w-[1024px] mx-auto h-14 px-4 flex items-center justify-between">
         {/* Logo */}
         <button onClick={() => navigate('/')} className="flex items-center gap-2 cursor-pointer">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-sm">
-            <span className="text-white text-sm font-bold">🍎</span>
+          <div className="w-8 h-8 rounded-xl shadow-sm overflow-hidden flex items-center justify-center bg-surface border border-border">
+            <img src="/logo.png" alt="AppleLink" className="w-full h-full object-cover" />
           </div>
           <div className="flex flex-col">
             <span className="text-base font-bold text-text-primary leading-tight tracking-tight">
