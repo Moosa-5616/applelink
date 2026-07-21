@@ -4,9 +4,18 @@
 // ═══════════════════════════════════════════════════
 
 export const APPLE_VARIETIES = [
-  'Royal Delicious', 'Golden Delicious', 'Red Delicious',
-  'Shimla', 'Kashmiri', 'Ambri', 'Maharaji',
-  'Fuji', 'Granny Smith', 'Honeycrisp', 'Gala'
+  'Akane', 'Alice', 'Alkmene', 'Ambri', 'Ambrosia', 'Anna', 'Arkansas Black', 
+  'Ashmead\'s Kernel', 'Aurora Golden Gala', 'Baldwin', 'Banana', 'Braeburn', 
+  'Bramley', 'Cameo', 'Campanino', 'Cortland', 'Cosmic Crisp', 'Court Pendu Plat', 
+  'Cox\'s Orange Pippin', 'Cripps Pink (Pink Lady)', 'Crispin (Mutsu)', 'D\'Arcy Spice', 
+  'Discovery', 'Egremont Russet', 'Empire', 'Enterprise', 'Envy', 'Fuji', 'Gala', 
+  'Ginger Gold', 'Golden Delicious', 'Granny Smith', 'Gravenstein', 'Haralson', 
+  'Honeycrisp', 'Idared', 'Jazz', 'Jersey Mac', 'Jonagold', 'Jonathan', 'Kashmiri', 
+  'Liberty', 'Lodi', 'Macoun', 'Maharaji', 'McIntosh', 'Melrose', 'Mutsu', 
+  'Newtown Pippin', 'Northern Spy', 'Opal', 'Orin', 'Pacific Rose', 'Paula Red', 
+  'Pinova', 'Red Delicious', 'Rome Beauty', 'Royal Delicious', 'Rubens', 'Salome', 
+  'Shimla', 'Spartan', 'Stayman', 'Suncrisp', 'SweeTango', 'Topaz', 'Wealthy', 
+  'Winesap', 'Winter Banana', 'Wolf River', 'York', 'Zestar', 'Other'
 ]
 
 export const DISTRICTS = [

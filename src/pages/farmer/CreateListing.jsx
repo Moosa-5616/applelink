@@ -9,6 +9,7 @@ import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Select from '../../components/ui/Select';
+import SearchableSelect from '../../components/ui/SearchableSelect';
 import Badge from '../../components/ui/Badge';
 
 export default function CreateListing() {
@@ -18,6 +19,7 @@ export default function CreateListing() {
 
   const [step, setStep] = useState(1); // 1 = Details, 2 = Confirmation, 3 = Success
   const [variety, setVariety] = useState('');
+  const [customVariety, setCustomVariety] = useState('');
   const [grade, setGrade] = useState('');
   const [quantity, setQuantity] = useState('');
   const [unit, setUnit] = useState('boxes');
@@ -38,7 +40,8 @@ export default function CreateListing() {
 
   const handleNext = (e) => {
     e.preventDefault();
-    if (!variety || !grade || !quantity || !expectedPrice || !harvestDate || !pickupDistrict || !pickupLocation) {
+    const finalVariety = variety === 'Other' ? customVariety : variety;
+    if (!finalVariety || !grade || !quantity || !expectedPrice || !harvestDate || !pickupDistrict || !pickupLocation) {
       setError('Please fill in all required setup details');
       return;
     }
@@ -63,9 +66,11 @@ export default function CreateListing() {
       }
 
       // Create the listing in Supabase
+      const finalVariety = variety === 'Other' ? customVariety : variety;
+      
       const { data, error: listingError } = await createListing({
         photos: photoUrls,
-        variety,
+        variety: finalVariety,
         grade,
         quantity: parseFloat(quantity),
         unit,
@@ -73,7 +78,7 @@ export default function CreateListing() {
         harvest_date: harvestDate,
         pickup_location: pickupLocation,
         pickup_district: pickupDistrict,
-        description: description || `Fresh Grade ${grade} ${variety} apples direct from our orchard in ${pickupLocation}.`,
+        description: description || `Fresh Grade ${grade} ${finalVariety} apples direct from our orchard in ${pickupLocation}.`,
       });
 
       if (listingError) throw listingError;
@@ -119,14 +124,25 @@ export default function CreateListing() {
             {error && <div className="text-xs bg-error-light text-error p-3 rounded-xl font-semibold">{error}</div>}
 
             {/* Apple Variety Selection */}
-            <Select
-              label="Apple Variety"
-              value={variety}
-              onChange={(e) => setVariety(e.target.value)}
-              options={APPLE_VARIETIES}
-              placeholder="Select apple variety"
-              required
-            />
+            <div className="flex flex-col gap-3">
+              <SearchableSelect
+                label="Apple Variety"
+                value={variety}
+                onChange={(e) => setVariety(e.target.value)}
+                options={APPLE_VARIETIES}
+                placeholder="Search or select apple variety"
+                required
+              />
+              {variety === 'Other' && (
+                <Input
+                  label="Specify Variety"
+                  value={customVariety}
+                  onChange={(e) => setCustomVariety(e.target.value)}
+                  placeholder="e.g. Kinnaur Special"
+                  required
+                />
+              )}
+            </div>
 
             {/* Grade Selection */}
             <Select
@@ -252,7 +268,7 @@ export default function CreateListing() {
 
             <div className="p-5 flex flex-col gap-4">
               <div>
-                <h3 className="text-lg font-bold text-text-primary">{variety} apples</h3>
+                <h3 className="text-lg font-bold text-text-primary">{variety === 'Other' ? customVariety : variety} apples</h3>
                 <p className="text-xs text-text-secondary mt-1">{pickupLocation}, {pickupDistrict}</p>
               </div>
 
